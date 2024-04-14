@@ -1,8 +1,15 @@
-from sensor.camera import cam_start_up,capture_image
-import plotext as pltx
+# for control of system
 from time import sleep
+import plotext as pltx
+
+# sensors
+from sensor.camera import cam_start_up,capture_image
+from sensor.gaussian_sensor import GaussianSensor
+from sensor.sawtooth_sensor import SawtoothSensor
+
+# for data writing
 from data.access import  initialize_session,write_data2image, write_data2csv
-from circular_collection import BufferQueue
+from model.abstract_buffer import CSVBufferQueue
 
 # TODO Löse folgende Liste
 """
@@ -17,6 +24,7 @@ from circular_collection import BufferQueue
 #List of data
 dataList = [0]
 imageTaken = False
+bufferSize = 50
 # state control
 NUM_STATES = 5
 state = 0
@@ -33,8 +41,14 @@ def on_start_up():
     initialize_session()
     cam_start_up()
     # set up buffers
+    # the order of passing here is important, as the animation is hard coded based on the order
     containers.extend(
-        BufferQueue()
+        CSVBufferQueue(GaussianSensor("Gaus 1",0,1),bufferSize),
+        CSVBufferQueue(GaussianSensor("Gaus 2",1,1),bufferSize),
+        CSVBufferQueue(GaussianSensor("Gaus 3",2,1),bufferSize),
+        CSVBufferQueue(SawtoothSensor("Saw 1",1,4),bufferSize),
+        BufferQueue(GaussianSensor(),bufferSize),
+        # camera
     )
 
 # method called for sampling passive sensors
