@@ -1,10 +1,10 @@
 import keyboard
-import model.model as model
+from model.model import on_start_up, action_loop, isr_state_transition, isr_state_action
 
 
 
-keyboard.on_release_key('w', model.isr_state_transition)
-keyboard.on_release_key('e', model.isr_state_action)
+keyboard.on_release_key('w', isr_state_transition)
+keyboard.on_release_key('e', isr_state_action)
 
 
 no_escape = True
@@ -13,7 +13,6 @@ def esc_key_action(keyboard_event):
     no_escape=False
 keyboard.on_release_key('esc',esc_key_action)
 
-
+on_start_up()
 while no_escape:
-    model.on_start_up()
-    model.action_loop()
+    action_loop()

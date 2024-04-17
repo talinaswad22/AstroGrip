@@ -2,7 +2,7 @@
 Tasks:
 - method for creating a file and it's meta file
 """
-from pathlib import path
+from pathlib import Path
 from yaml import dump
 from time import strftime, gmtime
 from cv2 import imwrite
@@ -23,7 +23,8 @@ def initialize_session():
 
     #TODO implement creation of metadata
 
-def path_existence_check(path):
+def path_existence_check(potential_path):
+    path = Path(potential_path)
     if not path.exists():
         try:
             path.mkdir()

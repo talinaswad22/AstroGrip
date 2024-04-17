@@ -12,7 +12,7 @@ class CameraBufferQueue(AbstractBufferQueue):
     
     # queue behavior
     def on_full(self):
-        write_data2image(self.__container,f"./{self.name}")
+        self.__last_uuid = write_data2image(self.__container,f"./{self.name}")
         self.__container = None
 
     
@@ -22,9 +22,13 @@ class CameraBufferQueue(AbstractBufferQueue):
 
     # sample/sensor behavior
     def sample(self):
+        if self.__open_jobs<=0:
+            raise Exception("CameraBufferQueue reached illegal state trying to take picture when no pending jobs exist.")
+        self.__container-=1
+
         # TODO add exception check here
         self.append(self.__sample_object.sample())
-        self.__container-=1
+        
 
     def transition(self):
         while self.__open_jobs>0:
@@ -32,3 +36,10 @@ class CameraBufferQueue(AbstractBufferQueue):
 
     def open_job(self):
         self.__open_jobs +=1
+
+    def check_for_jobs(self):
+        return self.__open_jobs>0
+
+    @property
+    def last_job(self):
+        return self.__last_uuid

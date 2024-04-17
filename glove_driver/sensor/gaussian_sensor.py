@@ -1,9 +1,10 @@
-import sensor.abstract_sensor as abstract_sensor
+from sensor.abstract_sensor import AbstractSensor
 from numpy.random import normal
 
-class GaussianSensor(abstract_sensor):
+class GaussianSensor(AbstractSensor):
     def __init__(self,name,mean=0,cov=1):
         super().__init__(name)
+        self.__initialize_sensor()
         self.mean = mean
         self.cov = cov
 

@@ -1,6 +1,8 @@
 class AbstractBufferQueue:
     def __init__(self,sample_object):
-        self.__sample_object = sample_object
+        if sample_object==None:
+            raise Exception("None sample_object passed to BufferQueue.")
+        self._sample_object = sample_object
     
     # queue behavior
     def on_full(self):
@@ -14,8 +16,11 @@ class AbstractBufferQueue:
         raise NotImplementedError()
     
     def transition(self):
-        raise NotImplementedError()
+        pass
+    
+    def open_job(self):
+        pass
     
     @property
     def name(self):
-        return self.sample_object.name
+        return self._sample_object.name

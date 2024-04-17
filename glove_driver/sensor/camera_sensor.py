@@ -1,11 +1,11 @@
-import sensor.abstract_sensor as abstract_sensor
-from numpy.random import normal
+from sensor.abstract_sensor import AbstractSensor
+from cv2 import VideoCapture
 
-class CameraSensor(abstract_sensor):
-    def __init__(self,name,mean=0,cov=1):
-        self.name = name
+class CameraSensor(AbstractSensor):
+    def __init__(self,name):
+        super().__init__(name)
+        self.__initialize_sensor()
         
-
     def __initialize_sensor(self):
         global _cap_device
         # Initialize the webcam

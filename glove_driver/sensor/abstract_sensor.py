@@ -1,7 +1,6 @@
 class AbstractSensor:
     def __init__(self,name):
-        self.__name
-        self.__initialize_sensor()
+        self._name = name
 
     def __initialize_sensor(self):
         raise NotImplementedError()
@@ -20,5 +19,5 @@ class AbstractSensor:
 
     @property
     def name(self):
-        return self.__name
+        return self._name
 
