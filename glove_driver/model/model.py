@@ -1,15 +1,15 @@
 # for control of system
 from time import sleep
 import plotext as pltx
+from keyboard import on_release_key
 
 # sensors
-from sensor.camera import cam_start_up,capture_image
 from sensor.gaussian_sensor import GaussianSensor
 from sensor.sawtooth_sensor import SawtoothSensor
 from sensor.camera_sensor import CameraSensor
 
 # for data writing
-from data.access import  initialize_session,write_data2image, write_data2csv
+from data.access import  initialize_session,create_access_path
 from model.csv_buffer import CSVBufferQueue
 from model.camera_buffer import CameraBufferQueue
 
@@ -35,8 +35,6 @@ labels = None
 ################################
 def on_start_up():
     global labels, data_buffer,time_buffer
-    initialize_session()
-    cam_start_up()
     # set up buffers
     # the order of passing here is important, as the animation is hard coded based on the order
     """
@@ -62,9 +60,16 @@ def on_start_up():
         CameraBufferQueue(CameraSensor(labels[4]))
     ]
     )
+    # initialize data layer session
+    initialize_session(labels,labels[:-1])
+
     # set current buffers for plotting, otherwise they'd be None
-    data_buffer = containers[0].data_buffer
-    time_buffer = containers[0].time_buffer
+    data_buffer = containers[state].data_buffer
+    if containers[state].use_time:
+        time_buffer = containers[state].time_buffer
+    # needs to be here, otherwise you could call method before assignment of variables
+    on_release_key('w', isr_state_transition)
+    on_release_key('e', isr_state_action)
 
 
 # method called for sampling passive sensors
@@ -78,13 +83,17 @@ def passive_sample():
 # state control
 ################################
 def isr_state_transition(keyboard_event):
-    global state
+    global state, data_buffer, time_buffer
     # transition of sensor and associated storage before into inactive state
     # as of now only active for taking image with camera
     containers[state].transition()
     state+=1
     if state==NUM_STATES:
         state=0
+
+    data_buffer = containers[state].data_buffer
+    if containers[state].use_time:
+        time_buffer = containers[state].time_buffer
     
 def isr_state_action(keyboard_event):
     global state
@@ -143,10 +152,10 @@ def animate(state):
             set_up_plot()
             pltx.plot(data_buffer)
         case 4: # image
-            if containers[state].check_for_jobs:
+            if containers[state].check_for_jobs():
                 containers[state].sample()
                 set_up_plot()
-                pltx.image_plot(f"./{containers[state].name}/{containers[state].last_job}.jpg")
+                pltx.image_plot(create_access_path(containers[state].name,containers[state].last_job,"jpg"))
         case _:
             pass
 

@@ -20,7 +20,7 @@ class CSVBufferQueue(AbstractBufferQueue):
     
     # queue behavior
     def on_full(self):
-        write_data2csv(self.__container,f"./{self.name}")
+        write_data2csv(self.__container,self.name)
         self.__container.clear()
     
     def append(self,values):
@@ -42,6 +42,10 @@ class CSVBufferQueue(AbstractBufferQueue):
     def data_buffer(self):
         return self.__data_buffer
     
+    @property
+    def use_time(self):
+        return self.__use_time
+
     @property
     def time_buffer(self):
         return self.__time_buffer

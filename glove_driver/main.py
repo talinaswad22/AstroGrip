@@ -3,8 +3,7 @@ from model.model import on_start_up, action_loop, isr_state_transition, isr_stat
 
 
 
-keyboard.on_release_key('w', isr_state_transition)
-keyboard.on_release_key('e', isr_state_action)
+
 
 
 no_escape = True

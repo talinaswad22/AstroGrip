@@ -10,7 +10,6 @@ class CameraSensor(AbstractSensor):
         global _cap_device
         # Initialize the webcam
         _cap_device = VideoCapture(0)  # 0 corresponds to the first webcam connected, 1 for the second, and so on
-
         # Check if the webcam is opened successfully
         if not _cap_device.isOpened():
             print("Error: Unable to open webcam.")
