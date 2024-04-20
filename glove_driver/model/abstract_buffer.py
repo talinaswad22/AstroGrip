@@ -15,6 +15,9 @@ class AbstractBufferQueue:
     def sample(self):
         raise NotImplementedError()
     
+    def close(self):
+        raise NotImplementedError()
+
     def transition(self):
         pass
     

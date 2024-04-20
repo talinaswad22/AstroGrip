@@ -7,6 +7,8 @@ from yaml import dump
 from time import strftime, gmtime
 from cv2 import imwrite
 from uuid import uuid4
+#from picamera import PiCamera
+from time import sleep
 import csv
 
 # TODO add error checking for functions
@@ -16,6 +18,7 @@ import csv
 
 _SESSION_ID = None
 _SUBDIR = "sensor_data"
+_CAM_RESOLUTION = (1024, 768)
 
 def initialize_session(directories, metadata_dirs):
     global _SESSION_ID
@@ -61,6 +64,19 @@ def write_data2image(image,path):
     _write_data2image(image,rf"./{_SUBDIR}/{path}",id)
     return id
 
+# only used in combination with direct access classes
+# not used, due to a np array also being passable
+"""
+def take_picam_image():
+    global _CAM_RESOLUTION
+    camera = PiCamera()
+    camera.resolution = _CAM_RESOLUTION
+    camera.start_preview()
+    # Camera warm-up time
+    sleep(2)
+    camera.capture('foo.jpg')
+"""
+
 
 #########################################################
 # data layer
@@ -74,7 +90,7 @@ def _write_data2csv(data_it, path,uuid):
     # check if path exists
     path_existence_check(path)
     # create csv 
-    with open(rf"{path}/{uuid}.csv",'a') as file:
+    with open(rf"{path}/{uuid}.csv",'a',newline='') as file:
         csvfile = csv.writer(file,delimiter=',')
         csvfile.writerows(data_it)
     

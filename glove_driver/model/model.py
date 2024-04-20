@@ -2,11 +2,12 @@
 from time import sleep
 import plotext as pltx
 from keyboard import on_release_key
+from time import time
 
 # sensors
-from sensor.gaussian_sensor import GaussianSensor
-from sensor.sawtooth_sensor import SawtoothSensor
-from sensor.camera_sensor import CameraSensor
+from sensor.dummy_gaussian_sensor import GaussianSensor
+from sensor.dummy_sawtooth_sensor import SawtoothSensor
+from sensor.dummy_camera_sensor import CameraSensor
 
 # for data writing
 from data.access import  initialize_session,create_access_path
@@ -23,18 +24,26 @@ time_buffer = None
 # state control
 NUM_STATES = 5
 state = 0
-sleep_time = 0.3
+# for controlling passive sampling
+PASSIVE_SAMPLE_PERIODS = 6
+passive_sample_counter = PASSIVE_SAMPLE_PERIODS
+# for controlling transition
+transition_signal = False
+# 0.5 should be left this way, because pressure/temperature sensor could potentially not sample faster
+# or needs to be adapted
+sleep_time = 0.5
 
 # figure
 #labels
 containers = []
+passive_containers = []
 labels = None
 
 ################################
 # action control
 ################################
 def on_start_up():
-    global labels, data_buffer,time_buffer
+    global labels, data_buffer,time_buffer, passive_containers, NUM_STATES
     # set up buffers
     # the order of passing here is important, as the animation is hard coded based on the order
     """
@@ -60,6 +69,9 @@ def on_start_up():
         CameraBufferQueue(CameraSensor(labels[4]))
     ]
     )
+    NUM_STATES = len(containers)
+
+    passive_containers = [0,1]
     # initialize data layer session
     initialize_session(labels,labels[:-1])
 
@@ -71,18 +83,30 @@ def on_start_up():
     on_release_key('w', isr_state_transition)
     on_release_key('e', isr_state_action)
 
+def on_shutdown():
+    # this function only gets called, when shutting down, do for example an interrupt
+    # so catching anything is reasonable, due to trying to free resources
+    for con in containers:
+        try:
+            con.close()
+        except:
+            pass
 
 # method called for sampling passive sensors
 def passive_sample():
     # sampling data
-    containers[0].sample()
-    containers[1].sample()
+    [containers[i].sample() for i in passive_containers if i != state]
+
 
 
 ################################
 # state control
 ################################
 def isr_state_transition(keyboard_event):
+    global transition_signal
+    transition_signal = True
+
+def transition_action():
     global state, data_buffer, time_buffer
     # transition of sensor and associated storage before into inactive state
     # as of now only active for taking image with camera
@@ -120,6 +144,10 @@ def set_up_plot():
     set_state_labels()
     pltx.subplot(1,1)
 
+def prepare_time_data(time_ar):
+    t = time()
+    return [x-t for x in time_ar]
+
 # main loop
 def animate(state):
     global data_buffer,time_buffer
@@ -129,28 +157,34 @@ def animate(state):
 
     # decide based on state
     
+    """
+    Tip: check up if above the time, buffer is set when calling prepare time, otherwise error happens
+    """
     
     
     match state:
         case 0: # temperature - scatter
             containers[state].sample() 
             set_up_plot()  
- 
-            pltx.plot(data_buffer)
+            #pltx.plot(data_buffer)
+            pltx.plot(prepare_time_data(time_buffer),data_buffer)
         case 1: # pressure - scatter
             containers[state].sample()
             set_up_plot()
             pltx.plot(data_buffer)
+            #pltx.plot(prepare_time_data(time_buffer),data_buffer)
                 
 
         case 2: # distance
             containers[state].sample()
             set_up_plot()
-            pltx.plot(data_buffer)
+            #pltx.plot(data_buffer)
+            pltx.plot(prepare_time_data(time_buffer),data_buffer)
         case 3: # spectrometer
             containers[state].sample()
             set_up_plot()
             pltx.plot(data_buffer)
+            
         case 4: # image
             if containers[state].check_for_jobs():
                 containers[state].sample()
@@ -162,6 +196,15 @@ def animate(state):
     pltx.show()
 
 def action_loop():
-    passive_sample()
+    global transition_signal, passive_sample_counter
+    # to ensure that the state does not get changed mid operation
+    if transition_signal:
+        transition_signal = False
+        transition_action()
+    # 
+    if not passive_sample_counter:
+        passive_sample_counter-=1
+        if not passive_sample_counter: passive_sample_counter= PASSIVE_SAMPLE_PERIODS
+        passive_sample()
     animate(state)
     sleep(sleep_time)

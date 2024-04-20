@@ -2,8 +2,14 @@ from model.abstract_buffer import AbstractBufferQueue
 from data.access import write_data2image
 from collections import deque
 from time import time
+"""
+Discontinued for now due to a np array being passable and the camera not being nessecary for the training event.
+Date: 2024.04.20
+"""
 
-class CameraBufferQueue(AbstractBufferQueue):
+
+
+class DirectCameraBufferQueue(AbstractBufferQueue):
     def __init__(self,sample_object, data_buffer_size=0, time_buffer=False):
         super().__init__(sample_object)
         if data_buffer_size<0:
@@ -19,13 +25,11 @@ class CameraBufferQueue(AbstractBufferQueue):
     
     # queue behavior
     def on_full(self):
-        self.__last_uuid = write_data2image(self.__container,self.name)
-        self.__container = None
+        pass
 
     
     def append(self,values):
-        self.__container = values
-        self.on_full()
+        pass
 
     # sample/sensor behavior
     def sample(self):
@@ -36,8 +40,6 @@ class CameraBufferQueue(AbstractBufferQueue):
         # TODO add exception check here
         self.append(self._sample_object.sample())
         
-    def close(self):
-        self._sample_object.turn_off()
 
     def transition(self):
         while self.__open_jobs>0:

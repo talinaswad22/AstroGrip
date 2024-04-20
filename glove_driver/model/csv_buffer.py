@@ -38,6 +38,9 @@ class CSVBufferQueue(AbstractBufferQueue):
     def sample(self):
         self.append(self._sample_object.sample())
 
+    def close(self):
+        self._sample_object.turn_off()
+
     @property
     def data_buffer(self):
         return self.__data_buffer
