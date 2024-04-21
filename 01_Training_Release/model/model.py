@@ -1,7 +1,7 @@
 # for control of system
 from time import sleep
 import plotext as pltx
-from keyboard import on_release_key
+import RPi.GPIO as GPIO
 from time import time
 
 # sensors
@@ -14,6 +14,9 @@ from data.access import  initialize_session
 from model.csv_buffer import CSVBufferQueue
 from model.camera_buffer import CameraBufferQueue
 
+# Buttons
+BUTTON_GPIO_ACTION = 16
+BUTTON_GPIO_TRANSITION = 4
 
 # on start up
 #List of data
@@ -29,6 +32,7 @@ PASSIVE_SAMPLE_PERIODS = 6
 passive_sample_counter = PASSIVE_SAMPLE_PERIODS
 # for controlling transition
 transition_signal = False
+
 # 0.5 should be left this way, because pressure/temperature sensor could potentially not sample faster
 # or needs to be adapted
 sleep_time = 0.5
@@ -78,9 +82,18 @@ def on_start_up():
     data_buffer = containers[state].data_buffer
     if containers[state].use_time:
         time_buffer = containers[state].time_buffer
+    
+    
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(BUTTON_GPIO_TRANSITION, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(BUTTON_GPIO_ACTION, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    
     # needs to be here, otherwise you could call method before assignment of variables
-    on_release_key('w', isr_state_transition)
-    on_release_key('e', isr_state_action)
+    GPIO.add_event_detect(BUTTON_GPIO_TRANSITION, GPIO.RISING, 
+            callback=isr_state_transition, bouncetime=50)
+    GPIO.add_event_detect(BUTTON_GPIO_ACTION, GPIO.RISING, 
+            callback=isr_state_action, bouncetime=50)
+
 
 def on_shutdown():
     # this function only gets called, when shutting down, do for example an interrupt
