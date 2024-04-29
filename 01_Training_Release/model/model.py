@@ -15,12 +15,12 @@ from model.csv_buffer import CSVBufferQueue
 from model.camera_buffer import CameraBufferQueue
 
 # Buttons
-BUTTON_GPIO_ACTION = 16
-BUTTON_GPIO_TRANSITION = 4
+#BUTTON_GPIO_ACTION = 16
+BUTTON_GPIO_TRANSITION = 16
 
 # on start up
 #List of data
-writeBufferSize = 50
+writeBufferSize = 10
 data_buffer = None
 time_buffer = None
 
@@ -69,7 +69,7 @@ def on_start_up():
                        ,storage_buffer_size=writeBufferSize,data_buffer_size=10,time_buffer=True),
         CSVBufferQueue(AdapterSensor("Pressure",shared_bmp,lambda x:x.sample_pressure())
                        ,storage_buffer_size=writeBufferSize,data_buffer_size=10,time_buffer=True),
-        CSVBufferQueue(SpectrometerSensor("Spectrometer"),writeBufferSize,data_buffer_size=10,time_buffer=False)
+        CSVBufferQueue(SpectrometerSensor("Spectrometer"),writeBufferSize,data_buffer_size=1,time_buffer=False)
     ]
     )
     NUM_STATES = len(containers)
@@ -86,16 +86,18 @@ def on_start_up():
     
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(BUTTON_GPIO_TRANSITION, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(BUTTON_GPIO_ACTION, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    #GPIO.setup(BUTTON_GPIO_ACTION, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
     # needs to be here, otherwise you could call method before assignment of variables
     GPIO.add_event_detect(BUTTON_GPIO_TRANSITION, GPIO.RISING, 
             callback=isr_state_transition, bouncetime=50)
-    GPIO.add_event_detect(BUTTON_GPIO_ACTION, GPIO.RISING, 
-            callback=isr_state_action, bouncetime=50)
+    #GPIO.add_event_detect(BUTTON_GPIO_ACTION, GPIO.RISING, 
+    #        callback=isr_state_action, bouncetime=50)
 
-
-def on_shutdown():
+# due to using sigint, two arguments have to be passed, which are not used
+def on_shutdown(sig, frame):
+    global containers
+    [con.on_full() for con in containers]
     # this function only gets called, when shutting down, do for example an interrupt
     # so catching anything is reasonable, due to trying to free resources
     for con in containers:
@@ -187,11 +189,11 @@ def animate(state):
             pltx.plot(prepare_time_data(time_buffer),data_buffer)
                 
 
-        case 2: # distance
+        case 2: # spectrometer
             containers[state].sample()
             set_up_plot()
             #TODO add wavelength area
-            pltx.plot(data_buffer)
+            pltx.plot(data_buffer[0])
         case _:
             pass
 
