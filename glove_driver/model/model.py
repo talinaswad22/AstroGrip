@@ -59,14 +59,14 @@ def on_start_up():
               "Saw 1",
               "Gaus 3",
               "Saw 1",
-              "Camera"
+              #"Camera"
               ]
     containers.extend([
         CSVBufferQueue(GaussianSensor(labels[0],0,1),writeBufferSize,data_buffer_size=10,time_buffer=True),
         CSVBufferQueue(SawtoothSensor(labels[3],1,4),writeBufferSize,data_buffer_size=10,time_buffer=False),
         CSVBufferQueue(GaussianSensor(labels[2],2,1),writeBufferSize,data_buffer_size=10,time_buffer=True),
         CSVBufferQueue(SawtoothSensor(labels[3],1,4),writeBufferSize,data_buffer_size=10,time_buffer=False),
-        CameraBufferQueue(CameraSensor(labels[4]))
+        #CameraBufferQueue(CameraSensor(labels[4]))
     ]
     )
     NUM_STATES = len(containers)
@@ -84,6 +84,8 @@ def on_start_up():
     on_release_key('e', isr_state_action)
 
 def on_shutdown():
+    # empty data queue
+    [con.on_full() for con in containers]
     # this function only gets called, when shutting down, do for example an interrupt
     # so catching anything is reasonable, due to trying to free resources
     for con in containers:

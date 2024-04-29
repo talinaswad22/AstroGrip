@@ -13,6 +13,7 @@ class CameraSensor(AbstractSensor):
         1. Initialize Smbus class
         """
         self.__bus = ByteSMBus(1)
+        sleep(1)
         self.__open = True
         self.__bmp = BMP581(self.__bus, address=0x47) # standard adress 0x47 is assumed
         # burn trough first recording
