@@ -11,4 +11,4 @@ try:
         action_loop()
 finally:
     # do some cleaning up, after for example an KeyboardInterrupt came
-    on_shutdown()
+    on_shutdown(None,None)
