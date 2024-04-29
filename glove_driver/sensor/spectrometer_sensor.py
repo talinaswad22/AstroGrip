@@ -1,5 +1,5 @@
 from sensor.abstract_sensor import AbstractSensor
-from sensor.drivers.spectrometer import i2c,readCAL#,readRAW
+from sensor.drivers.spectrometer.spectrometer import i2c,readCAL#,readRAW
 
 
 class SpectrometerSensor(AbstractSensor):

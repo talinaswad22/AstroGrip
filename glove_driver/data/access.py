@@ -5,7 +5,7 @@ Tasks:
 from pathlib import Path
 from yaml import dump
 from time import strftime, gmtime
-from cv2 import imwrite
+from PIL import Image
 from uuid import uuid4
 #from picamera import PiCamera
 from time import sleep
@@ -102,4 +102,5 @@ def _write_data2image(image,path,uuid,):
     # create meta file
     _create_metadata(path,uuid)
     # save image
-    imwrite(rf"{path}/{uuid}.jpg",image)
+    im = Image().fromarray(image)
+    im.save(rf"{path}/{uuid}.jpg")
