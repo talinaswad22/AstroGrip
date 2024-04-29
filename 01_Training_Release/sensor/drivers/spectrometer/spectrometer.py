@@ -2,7 +2,7 @@
 # Feb 2019. Version 1
 
 
-from smbus import SMBus											# Module for I2C
+from smbus2 import SMBus											# Module for I2C
 import time
 
 # ---- Globals / Constants -----
