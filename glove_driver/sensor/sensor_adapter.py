@@ -24,7 +24,7 @@ class AdapterSensor(AbstractSensor):
 
     @property
     def name(self):
-        return self._name
+        return self.__sensor.name
     
     @property
     def sensor(self):
