@@ -3,8 +3,8 @@ from sensor.drivers.bmp581.smbus_adaption import ByteSMBus
 from sensor.drivers.bmp581.bmp581 import BMP581
 from time import sleep
 
-class CameraSensor(AbstractSensor):
-    def __init__(self,name,temperature=True):
+class BMP581Sensor(AbstractSensor):
+    def __init__(self,name):
         super().__init__(name)
         self.__initialize_sensor()
         
