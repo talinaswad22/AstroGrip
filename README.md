@@ -5,5 +5,5 @@ A general class overview for glove_driver/the training release is seen here. On 
 ![ClassDiagram](https://github.com/THB-account/AstroGrip/blob/main/doc/ClassDiagram.svg)
 The general structure is layer based, for which there are the model, buffer, sensor and data layer. Interaction between the main loop and data aswell as sensors happens trough the Buffer classes.
 
-![FlowChart]([https://github.com/THB-account/AstroGrip/blob/main/doc/FlussDiagramm.svg])
+![FlowChart](https://github.com/THB-account/AstroGrip/blob/main/doc/FlussDiagramm.svg)
 
