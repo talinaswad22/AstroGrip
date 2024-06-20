@@ -12,7 +12,7 @@ class MainScreenView:
         
         self.state = 0
         self.NUM_STATES = len(containers)
-        self.transition_signal = None
+        self.transition_signal = False
 
         self.containers = containers
         self.labels = labels
@@ -43,9 +43,13 @@ class MainScreenView:
         self.containers[self.state].open_job()
 
     def animate(self):
+        # as this handles the internal state
+        # and animate being the main sate of action
+        # this should be done here
         if self.transition_signal:
             self.transition_signal = False
             self.transition_action()
+        
         match self.state:
             case 0: # temperature - scatter
                 self.containers[self.state].sample() 
@@ -85,10 +89,10 @@ class MainScreenView:
         self.set_state_labels()
         pltx.subplot(1,1)
 
-    def set_state_labels(self.state):
+    def set_state_labels(self):
         pltx.subplot(1,2)
         temp = self.labels.copy()
-        temp[state] = f"> {temp[state]}"
+        temp[self.state] = f"> {temp[self.state]}"
         [pltx.text(temp[i], x=1,y=i,alignment="center",color="red") for i in range(len(temp))]
 
     def on_shutdown(self):

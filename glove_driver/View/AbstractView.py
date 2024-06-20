@@ -8,5 +8,5 @@ class AbstractView:
     def isr_state_action(self):
         raise NotImplementedError()
 
-    def animate(self)
+    def animate(self):
         raise NotImplementedError()
