@@ -84,20 +84,12 @@ def on_start_up():
     on_release_key('e', isr_state_action)
 
 def on_shutdown():
-    # empty data queue
-    [con.on_full() for con in containers]
-    # this function only gets called, when shutting down, do for example an interrupt
-    # so catching anything is reasonable, due to trying to free resources
-    for con in containers:
-        try:
-            con.close()
-        except:
-            pass
+    # TODO add functionality
+    pass
 
 # method called for sampling passive sensors
 def passive_sample():
-    # sampling data
-    [containers[i].sample() for i in passive_containers if i != state]
+    pass
 
 
 
@@ -105,105 +97,41 @@ def passive_sample():
 # state control
 ################################
 def isr_state_transition(keyboard_event):
-    global transition_signal
-    transition_signal = True
+    # TODO add state transition
+
 
 def transition_action():
-    global state, data_buffer, time_buffer
-    # transition of sensor and associated storage before into inactive state
-    # as of now only active for taking image with camera
-    containers[state].transition()
-    state+=1
-    if state==NUM_STATES:
-        state=0
-
-    data_buffer = containers[state].data_buffer
-    if containers[state].use_time:
-        time_buffer = containers[state].time_buffer
+    # TODO add functionality
+    
     
 def isr_state_action(keyboard_event):
-    global state
-    # this is just used for setting an open job
-    # for taking a picture, but could be used for other tasks
-    # should only change the internal state of a data collection object
-    containers[state].open_job()
+    # TODO add View call
+    pass
 
 
 
 ################################
 # set figure
 ################################
-def set_state_labels():
-    global state
-    pltx.subplot(1,2)
-    temp = labels.copy()
-    temp[state] = f"> {temp[state]}"
-    [pltx.text(temp[i], x=1,y=i,alignment="center",color="red") for i in range(len(temp))]
 
-def set_up_plot():
-    pltx.clf()
-    pltx.subplots(1,2)      
-    set_state_labels()
-    pltx.subplot(1,1)
 
-def prepare_time_data(time_ar):
-    t = time()
-    return [x-t for x in time_ar]
+
+
+
 
 # main loop
-def animate(state):
-    global data_buffer,time_buffer
-    # control of what gets sampled
-
-    # sample values
-
-    # decide based on state
-    
+def animate(state):   
     """
     Tip: check up if above the time, buffer is set when calling prepare time, otherwise error happens
     """
+    # TODO add animate current View method
     
     
-    match state:
-        case 0: # temperature - scatter
-            containers[state].sample() 
-            set_up_plot()  
-            #pltx.plot(data_buffer)
-            pltx.plot(prepare_time_data(time_buffer),data_buffer)
-        case 1: # pressure - scatter
-            containers[state].sample()
-            set_up_plot()
-            pltx.plot(data_buffer)
-            #pltx.plot(prepare_time_data(time_buffer),data_buffer)
-                
-
-        case 2: # distance
-            containers[state].sample()
-            set_up_plot()
-            #pltx.plot(data_buffer)
-            pltx.plot(prepare_time_data(time_buffer),data_buffer)
-        case 3: # spectrometer
-            containers[state].sample()
-            set_up_plot()
-            pltx.plot(data_buffer)
-            
-        case 4: # image
-            if containers[state].check_for_jobs():
-                containers[state].sample()
-                set_up_plot()
-                pltx.image_plot(create_access_path(containers[state].name,containers[state].last_job,"jpg"))
-        case _:
-            pass
-
-    pltx.show()
+    
 
 def action_loop():
-    global transition_signal, passive_sample_counter
     # to ensure that the state does not get changed mid operation
-    if transition_signal:
-        transition_signal = False
-        transition_action()
-    # 
+    # TODO Replace passive sampling
     if not passive_sample_counter:
         passive_sample_counter-=1
         if not passive_sample_counter: passive_sample_counter= PASSIVE_SAMPLE_PERIODS
