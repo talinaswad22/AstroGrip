@@ -3,6 +3,7 @@ Tasks:
 - method for creating a file and it's meta file
 """
 from pathlib import Path
+from os.path import isfile
 from yaml import dump
 from time import strftime, gmtime
 from PIL import Image
@@ -104,3 +105,14 @@ def _write_data2image(image,path,uuid,):
     # save image
     im = Image().fromarray(image)
     im.save(rf"{path}/{uuid}.jpg")
+
+def read_sop_text():
+
+    path_existence_check("./config")
+    if not isfile("./config/sop_config.txt"):
+        with open("./config/sop_config.txt", "w") as file:
+            file.write("There was no text for sop in config/sop_config.txt. So dummy text was created.")
+
+    # this reads a txt automatically
+    with open("./config/sop_config.txt",'r') as stream:
+        return stream.read()

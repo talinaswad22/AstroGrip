@@ -10,7 +10,7 @@ from sensor.dummy_sawtooth_sensor import SawtoothSensor
 from sensor.dummy_camera_sensor import CameraSensor
 
 # for data writing
-from data.access import  initialize_session,create_access_path
+from data.access import  initialize_session,read_sop_text
 from model.csv_buffer import CSVBufferQueue
 from model.camera_buffer import CameraBufferQueue
 
@@ -70,10 +70,11 @@ def on_start_up():
     # initialize data layer session
     initialize_session(labels,labels[:-1])
 
+
+
     # create Views
     main_view = MainScreenView(containers,passive_containers,labels)
-    manual_view = ManualScreenView()
-
+    manual_view = ManualScreenView(read_sop_text())
     # needs to be here, otherwise you could call method before assignment of variables
     on_release_key('w', isr_state_transition)
     on_release_key('e', isr_state_action)

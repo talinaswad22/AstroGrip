@@ -1,21 +1,49 @@
 from View.AbstractView import AbstractView
 import plotext as pltx
+from plotext import xticks,yticks,clf,show,text,tw,th
+from textwrap import wrap
 
 class ManualScreenView(AbstractView):
-    def __init__(self):
-        self.colors = ["red", "blue", "green"]
-        self.color_state = 0
+    def __init__(self, manual_text):
+
+        # terminal width -2 because two characters are the sidebars
+        # -4 as little spacing
+        self.lines = wrap(manual_text,width=tw()-2-4,break_long_words=False,replace_whitespace=False)
+        # just for comparison
+        self.num_lines = len(self.lines)
+        # top and bottom line = 2
+        # -1 from plotext that is not used
+        # -2 at the bottom
+        # limit
+        self.text_num_lines = th() - 3 -2
+        self.line_idx = 0
+        self.step_size = 2
+        self.__build_text()
+        
+        
+    def __build_text(self):
+        self.display_text= '\n'.join(self.lines[self.line_idx: min(self.text_num_lines,self.line_idx + self.text_num_lines)])
 
     def isr_state_transition(self):
-        self.color_state = 0 if self.color_state == len(self.colors)-1 else self.color_state+1
+        if self.line_idx >= self.step_size:
+            self.line_idx -= self.step_size
+            
+        else:
+            self.line_idx = 0
+        self.__build_text()
     
     def isr_state_action(self):
-        self.color_state =  len(self.colors)-1 if self.color_state==0 else self.color_state-1
+        if self.line_idx <= self.num_lines-self.step_size:
+            self.line_idx += self.step_size
+            self.__build_text()
 
 
     def animate(self):
         pltx.clf()
-        pltx.text("Innocent Text that is not a placeholder for something really bad I wrote", x=0,y=0,alignment="center",color=self.colors[self.color_state])
+        #pltx.plot([0.,-1.],[0.,-1.])
+        pltx.text(self.display_text, x=0,y=0,alignment="left")
+        pltx.xlim(0.,1.)
+        pltx.ylim(0.,-1.)
         pltx.xticks([])
         pltx.yticks([])
         pltx.show()
