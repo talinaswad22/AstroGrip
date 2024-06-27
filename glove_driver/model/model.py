@@ -24,12 +24,13 @@ from View.ManualScreen import ManualScreenView
 writeBufferSize = 50
 
 # state control
-view_state = 0
+view_state = 1
 main_view = None
 manual_view = None
 # for controlling passive sampling
 PASSIVE_SAMPLE_PERIODS = 6
 passive_sample_counter = PASSIVE_SAMPLE_PERIODS
+CAMERA_STATE = 4
 # 0.5 should be left this way, because pressure/temperature sensor could potentially not sample faster
 # or needs to be adapted
 sleep_time = 0.5
@@ -53,18 +54,19 @@ def on_start_up():
     4. JPG - Image
     Make the passive sensors come first as they will always be on and not draw unnessecary power
     """
+
     labels = ["Gaus 1",
               "Saw 1",
-              "Gaus 3",
-              "Saw 1",
-              #"Camera"
+              "Gaus 2",
+              "Saw 2",
+              "Camera"
               ]
     containers = [
         CSVBufferQueue(GaussianSensor(labels[0],0,1),writeBufferSize,data_buffer_size=10,time_buffer=True),
         CSVBufferQueue(SawtoothSensor(labels[3],1,4),writeBufferSize,data_buffer_size=10,time_buffer=False),
         CSVBufferQueue(GaussianSensor(labels[2],2,1),writeBufferSize,data_buffer_size=10,time_buffer=True),
         CSVBufferQueue(SawtoothSensor(labels[3],1,4),writeBufferSize,data_buffer_size=10,time_buffer=False),
-        #CameraBufferQueue(CameraSensor(labels[4]))
+        CameraBufferQueue(CameraSensor(labels[4]))
     ]
     passive_containers = [0,1]
     # initialize data layer session
@@ -78,7 +80,6 @@ def on_start_up():
     # needs to be here, otherwise you could call method before assignment of variables
     on_release_key('w', isr_state_transition)
     on_release_key('e', isr_state_action)
-    on_release_key("r", isr_view_transition)
 
 def on_shutdown():
     main_view.on_shutdown()
@@ -91,23 +92,26 @@ def passive_sample():
 ################################
 # state control
 ################################
+# plot button, used for plot
 def isr_state_transition(keyboard_event):
-    if view_state==0:
-        main_view.isr_state_transition()
-    else:
-        manual_view.isr_state_transition()    
-    
-    
-def isr_state_action(keyboard_event):
-    if view_state==0:
-        main_view.isr_state_action()
-    else:
-        manual_view.isr_state_action()
-
-def isr_view_transition(keyboard_event):
     global view_state
-    # it's the xor operator
-    view_state ^= 1
+    if view_state==1: # if in plot mode
+        view_state=0
+    else:
+        main_view.isr_state_transition()   
+    
+# sop button, used for sop
+def isr_state_action(keyboard_event):
+    global view_state
+    if view_state==0: # if in plot mode
+        # sensor is currently camera take a picture
+        if main_view.state == CAMERA_STATE:
+            main_view.isr_state_action()
+        else:# otherwise go into SOP mode
+            view_state=1
+    else:
+        # SOP screen scroll
+        manual_view.isr_state_action()
 
 
 ################################
@@ -123,8 +127,6 @@ def animate():
         main_view.animate()
     else:
         manual_view.animate()
-    
-    
     
 
 def action_loop():

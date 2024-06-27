@@ -24,28 +24,27 @@ class ManualScreenView(AbstractView):
         
         
     def __build_text(self):
-        #self.display_text= '\n'.join(self.lines[self.line_idx: self.line_idx + self.display_text_num_lines])
+        # build text everytime a change is made so it is not rebuild every animation frame
         self.display_text= '\n'.join(self.lines[self.line_idx: min(self.num_lines,self.line_idx + self.display_text_num_lines)])
-
-    def isr_state_transition(self):
-        if self.line_idx >= self.step_size:
-            self.line_idx -= self.step_size
-        else: # prevent doing steps into the negative
-            self.line_idx = 0
-        self.__build_text()
         
-    
+    # aka SOP button
     def isr_state_action(self):
-        if self.line_idx <= self.num_lines - self.display_text_num_lines -  self.step_size:
+        # if already at maximum return to beginning
+        # otherwise increment correspondingly while respecting bounds
+        if self.line_idx == self.num_lines - self.display_text_num_lines:
+            self.line_idx = 0
+        elif self.line_idx <= self.num_lines - self.display_text_num_lines -  self.step_size:
             self.line_idx += self.step_size
-        else:
+        else: # if no adequate step size is possible set to limit
             self.line_idx = self.num_lines - self.display_text_num_lines
+        
         self.__build_text()
         
 
     def animate(self):
         pltx.clf()
         pltx.text(self.display_text, x=0,y=0,alignment="left")
+        # center text to top left corner
         pltx.xlim(0.,1.)
         pltx.ylim(0.,-1.)
         pltx.xticks([])

@@ -8,7 +8,7 @@ def prepare_time_data(time_ar):
 
 class MainScreenView:
     def __init__(self,containers,passive_containers,labels):
-        # TODO change everything here with None to appropriate value
+        # TODO encapsulate attributes. This is dangerous at the moment
         
         self.state = 0
         self.NUM_STATES = len(containers)
@@ -23,7 +23,7 @@ class MainScreenView:
 
     def isr_state_transition(self):
         self.transition_signal = True
-
+    # aka plot button
     def transition_action(self):
         # transition of sensor and associated storage before into inactive state
         # as of now only active for taking image with camera
@@ -36,6 +36,8 @@ class MainScreenView:
         if self.containers[self.state].use_time:
             self.time_buffer = self.containers[self.state].time_buffer
     
+    # SOP plot button
+    # just used for camera
     def isr_state_action(self):
         # this is just used for setting an open job
         # for taking a picture, but could be used for other tasks
@@ -93,7 +95,9 @@ class MainScreenView:
         pltx.subplot(1,2)
         temp = self.labels.copy()
         temp[self.state] = f"> {temp[self.state]}"
-        [pltx.text(temp[i], x=1,y=i,alignment="center",color="red") for i in range(len(temp))]
+        [pltx.text(temp[i], x=1,y=-i,alignment="center",color="red") for i in range(len(temp))]
+        pltx.xticks([])
+        pltx.yticks([])
 
     def on_shutdown(self):
         # empty data queue
