@@ -1,3 +1,7 @@
+import sys
+if("glove_driver" not in sys.path)
+    sys.path.insert(0, './glove_driver')
+
 import keyboard
 import model.model as model
 
