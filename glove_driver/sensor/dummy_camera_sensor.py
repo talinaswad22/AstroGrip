@@ -1,5 +1,5 @@
 from sensor.abstract_sensor import AbstractSensor
-from cv2 import VideoCapture
+#from cv2 import VideoCapture
 
 class CameraSensor(AbstractSensor):
     def __init__(self,name):

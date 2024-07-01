@@ -1,4 +1,4 @@
-from cv2 import VideoCapture
+#from cv2 import VideoCapture
 _cap_device = None
 
 def cam_start_up():
