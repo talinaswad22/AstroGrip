@@ -147,13 +147,17 @@ def isr_state_action(keyboard_event):
 ################################
 def set_state_labels():
     global state
-    pltx.subplot(1,2)
+    pltx.subplot(1,2).plot_size(pltx.tw() //4, None)
+    pltx.title("Sensors")
     temp = labels.copy()
     temp[state] = f"> {temp[state]}"
-    [pltx.text(temp[i], x=1,y=i,alignment="center",color="red") for i in range(len(temp))]
+    [pltx.text(temp[i], x=1,y=i,alignment="center",color="green",style="italic") for i in range(len(temp))]
+    pltx.xticks([])
+    pltx.yticks([])
 
 def set_up_plot():
     pltx.clf()
+    pltx.title("Data")
     pltx.subplots(1,2)      
     set_state_labels()
     pltx.subplot(1,1)
@@ -177,23 +181,33 @@ def animate(state):
     
     
     match state:
-        case 0: # temperature - scatter
+        case 0: # spectrometer - scatter
             containers[state].sample() 
             set_up_plot()  
             #pltx.plot(data_buffer)
+            pltx.ylabel("x: wavelength nm",2)
+            pltx.ylabel("y: amplitude")
             pltx.plot(prepare_time_data(time_buffer),data_buffer)
-        case 1: # pressure - scatter
+        case 1: #  - pressure scatter
             containers[state].sample()
             set_up_plot()
             #pltx.plot(data_buffer)
             pltx.plot(prepare_time_data(time_buffer),data_buffer)
-                
+            pltx.ylabel("x: time(s)",2)
+            pltx.ylabel("y: pressure kPa") 
 
-        case 2: # spectrometer
+        case 2: # temperature
             containers[state].sample()
             set_up_plot()
             #TODO add wavelength area
             pltx.plot(data_buffer[0])
+            pltx.ylabel("x: time(s)",2)
+            pltx.ylabel("y: temperature C°")
+        case 3: # distance
+            pltx.ylabel("x: time(s)",2)
+            pltx.ylabel("y: distance m")
+        case 4: # camera
+    
         case _:
             pass
 
