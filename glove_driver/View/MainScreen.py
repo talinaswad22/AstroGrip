@@ -87,7 +87,7 @@ class MainScreenView:
                 if self.containers[self.state].check_for_jobs():
                     self.containers[self.state].sample()
                     self.set_up_plot()
-                    #pltx.image_plot(create_access_path(self.containers[self.state].name,self.containers[self.state].last_job,"jpg"))
+                    pltx.image_plot(create_access_path(self.containers[self.state].name,self.containers[self.state].last_job,"jpg"))
             case _:
                 pass
 
