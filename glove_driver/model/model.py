@@ -42,15 +42,15 @@ sleep_time = 0.5
 # action control
 ################################
 def on_start_up():
-    global main_view,manual_view
+    global main_view,manual_view,CAMERA_STATE
     # set up buffers
     # the order of passing here is important, as the animation is hard coded based on the order
     """
     Order Should be:
-    0. CSV - Temperature
+    0. CSV over nm - Spectrometer
     1. CSV - Pressure
-    2. CSV - Distance
-    3. CSV - Spectrometer
+    2. CSV - Temperature
+    3. CSV - Distance
     4. JPG - Image
     Make the passive sensors come first as they will always be on and not draw unnessecary power
     """
@@ -68,6 +68,7 @@ def on_start_up():
         CSVBufferQueue(SawtoothSensor(labels[3],1,4),writeBufferSize,data_buffer_size=10,time_buffer=False),
         CameraBufferQueue(CameraSensor(labels[4]))
     ]
+    CAMERA_STATE = 4
     passive_containers = [0,1]
     # initialize data layer session
     initialize_session(labels,labels[:-1])
