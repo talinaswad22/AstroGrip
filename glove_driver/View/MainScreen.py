@@ -53,29 +53,37 @@ class MainScreenView:
             self.transition_action()
         
         match self.state:
-            case 0: # temperature - scatter
+            case 0: # spectrometer - scatter
                 self.containers[self.state].sample() 
                 self.set_up_plot()  
                 #pltx.plot(self.data_buffer)
-                pltx.plot(prepare_time_data(self.time_buffer),self.data_buffer)
+                pltx.ylabel("x: wavelength nm",2)
+                pltx.ylabel("y: amplitude")
+                pltx.plot(self.data_buffer[0])
             case 1: # pressure - scatter
                 self.containers[self.state].sample()
                 self.set_up_plot()
-                pltx.plot(self.data_buffer)
+                pltx.ylabel("x: time(s)",2)
+                pltx.ylabel("y: pressure kPa") 
+                pltx.plot(prepare_time_data(self.time_buffer),self.data_buffer)
                 #pltx.plot(prepare_time_data(self.time_buffer),self.data_buffer)
                     
 
-            case 2: # distance
+            case 2: # temperature
                 self.containers[self.state].sample()
                 self.set_up_plot()
                 #pltx.plot(self.data_buffer)
+                pltx.ylabel("x: time(s)",2)
+                pltx.ylabel("y: temperature C°")
                 pltx.plot(prepare_time_data(self.time_buffer),self.data_buffer)
-            case 3: # spectrometer
+            case 3: # distance
                 self.containers[self.state].sample()
                 self.set_up_plot()
-                pltx.plot(self.data_buffer)
+                pltx.ylabel("x: time(s)",2)
+                pltx.ylabel("y: distance m")
+                pltx.plot(prepare_time_data(self.time_buffer),self.data_buffer)
                 
-            case 4: # image
+            case 4: # camera
                 if self.containers[self.state].check_for_jobs():
                     self.containers[self.state].sample()
                     self.set_up_plot()
@@ -87,15 +95,17 @@ class MainScreenView:
 
     def set_up_plot(self):
         pltx.clf()
+        pltx.title("Data")
         pltx.subplots(1,2)      
         self.set_state_labels()
         pltx.subplot(1,1)
 
     def set_state_labels(self):
-        pltx.subplot(1,2)
+        pltx.subplot(1,2).plot_size(pltx.tw() // 4, None)
+        pltx.title("Sensors")
         temp = self.labels.copy()
         temp[self.state] = f"> {temp[self.state]}"
-        [pltx.text(temp[i], x=1,y=-i,alignment="center",color="red") for i in range(len(temp))]
+        [pltx.text(temp[i], x=1,y=-i,alignment="center",color="green",style="italic") for i in range(len(temp))]
         pltx.xticks([])
         pltx.yticks([])
 
