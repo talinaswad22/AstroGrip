@@ -1,6 +1,7 @@
 from View.AbstractView import AbstractView
 import plotext as pltx
 from time import time
+from data.access import create_access_path
 
 def prepare_time_data(time_ar):
         t = time()
@@ -65,9 +66,7 @@ class MainScreenView:
                 self.set_up_plot()
                 pltx.ylabel("x: time(s)",2)
                 pltx.ylabel("y: pressure kPa") 
-                pltx.plot(prepare_time_data(self.time_buffer),self.data_buffer)
-                #pltx.plot(prepare_time_data(self.time_buffer),self.data_buffer)
-                    
+                pltx.plot(prepare_time_data(self.time_buffer),self.data_buffer)                    
 
             case 2: # temperature
                 self.containers[self.state].sample()
@@ -111,7 +110,7 @@ class MainScreenView:
 
     def on_shutdown(self):
         # empty data queue
-        [con.on_full() for con in self.containers]
+        [con.on_shutdown() for con in self.containers]
         # this function only gets called, when shutting down, do for example an interrupt
         # so catching anything is reasonable, due to trying to free resources
         for con in self.containers:

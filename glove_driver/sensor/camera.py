@@ -1,4 +1,5 @@
-#from cv2 import VideoCapture
+from cv2 import VideoCapture
+from PIL import Image
 _cap_device = None
 
 def cam_start_up():
@@ -20,4 +21,4 @@ def capture_image():
         _cap_device.release()
         raise Exception("Exception when trying to capture image")
     
-    return image
+    return Image.open(image)

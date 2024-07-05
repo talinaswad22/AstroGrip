@@ -8,6 +8,7 @@ from time import time
 from sensor.dummy_gaussian_sensor import GaussianSensor
 from sensor.dummy_sawtooth_sensor import SawtoothSensor
 from sensor.dummy_camera_sensor import CameraSensor
+from sensor.dummy_spectrometer_sensor import SpectrometerSensor
 
 # for data writing
 from data.access import  initialize_session,read_sop_text
@@ -24,7 +25,7 @@ from View.ManualScreen import ManualScreenView
 writeBufferSize = 50
 
 # state control
-view_state = 1
+view_state = 0
 main_view = None
 manual_view = None
 # for controlling passive sampling
@@ -55,21 +56,21 @@ def on_start_up():
     Make the passive sensors come first as they will always be on and not draw unnessecary power
     """
 
-    labels = ["Gaus 1",
+    labels = ["Spectrometer",
               "Saw 1",
               "Gaus 2",
               "Saw 2",
               "Camera"
               ]
     containers = [
-        CSVBufferQueue(GaussianSensor(labels[0],0,1),writeBufferSize,data_buffer_size=10,time_buffer=True),
-        CSVBufferQueue(SawtoothSensor(labels[3],1,4),writeBufferSize,data_buffer_size=10,time_buffer=False),
+        CSVBufferQueue(SpectrometerSensor(labels[0],0,1),writeBufferSize,data_buffer_size=1,time_buffer=False),
+        CSVBufferQueue(SawtoothSensor(labels[3],1,4),writeBufferSize,data_buffer_size=10,time_buffer=True),
         CSVBufferQueue(GaussianSensor(labels[2],2,1),writeBufferSize,data_buffer_size=10,time_buffer=True),
-        CSVBufferQueue(SawtoothSensor(labels[3],1,4),writeBufferSize,data_buffer_size=10,time_buffer=False),
+        CSVBufferQueue(SawtoothSensor(labels[3],1,4),writeBufferSize,data_buffer_size=10,time_buffer=True),
         CameraBufferQueue(CameraSensor(labels[4]))
     ]
     CAMERA_STATE = 4
-    passive_containers = [0,1]
+    passive_containers = [1,2]
     # initialize data layer session
     initialize_session(labels,labels[:-1])
 
@@ -96,7 +97,7 @@ def passive_sample():
 # plot button, used for plot
 def isr_state_transition(keyboard_event):
     global view_state
-    if view_state==1: # if in plot mode
+    if view_state==1: # if in manual mode
         view_state=0
     else:
         main_view.isr_state_transition()   

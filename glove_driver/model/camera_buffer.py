@@ -46,6 +46,8 @@ class CameraBufferQueue(AbstractBufferQueue):
     def open_job(self):
         self.__open_jobs +=1
 
+    def on_shutdown(self):
+        pass
 
     def check_for_jobs(self):
         return (self.__open_jobs>0)

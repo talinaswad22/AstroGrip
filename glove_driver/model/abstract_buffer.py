@@ -23,6 +23,9 @@ class AbstractBufferQueue:
     
     def open_job(self):
         pass
+
+    def on_shutdown(self):
+        self.on_full()
     
     @property
     def name(self):

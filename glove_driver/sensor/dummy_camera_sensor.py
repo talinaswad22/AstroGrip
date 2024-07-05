@@ -1,5 +1,6 @@
 from sensor.abstract_sensor import AbstractSensor
-#from cv2 import VideoCapture
+from cv2 import VideoCapture
+from PIL import Image
 
 class CameraSensor(AbstractSensor):
     def __init__(self,name):
@@ -29,4 +30,4 @@ class CameraSensor(AbstractSensor):
             _cap_device.release()
             raise Exception("Exception when trying to capture image")
         
-        return image
+        return Image.fromarray(image)

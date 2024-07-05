@@ -1,5 +1,5 @@
 from sensor.abstract_sensor import AbstractSensor
-from numpy.random import normal
+from random import gauss
 
 class GaussianSensor(AbstractSensor):
     def __init__(self,name,mean=0,cov=1):
@@ -18,4 +18,4 @@ class GaussianSensor(AbstractSensor):
         pass
 
     def sample(self):
-        return normal(self.mean,self.cov)
+        return gauss(self.mean,self.cov)
