@@ -103,8 +103,9 @@ def _write_data2image(image,path,uuid,):
     # create meta file
     _create_metadata(path,uuid)
     # save image
-    im = Image().fromarray(image)
-    im.save(rf"{path}/{uuid}.jpg")
+    # old variant with saving from numpy array
+    #im = Image().fromarray(image)
+    image.save(rf"{path}/{uuid}.jpg")
 
 def read_sop_text():
 
